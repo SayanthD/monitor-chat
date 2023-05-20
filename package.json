@@ -1,0 +1,24 @@
+{
+  "name": "monitor_chat",
+  "version": "1.0.0",
+  "description": "Script used to collect incoming media from one group to other",
+  "main": "index.ts",
+  "author": "SayanthD",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "telegram": "^2.17.4",
+    "typescript": "^5.0.4",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.1"  
+  },
+  "scripts": {
+    "start": "npx ts-node index.ts"
+  },
+  "keywords": [
+    "telegram",
+    "gramjs"
+  ]
+}
