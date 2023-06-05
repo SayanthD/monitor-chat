@@ -69,10 +69,11 @@ async function getReported(event: NewMessageEvent) {
         if (!message.replyTo) return;
         console.log(`found keywords at id: ${message.id} pointing -> ${message.replyTo.replyToMsgId}`);
         console.log(`reported text: ${message.message}`);
-        const reportedMedia = message.replyTo ? (await client.getMessages(sourceChat, { ids: message.replyTo.replyToMsgId }))[0] : null;
+        const reportedMedia = message.replyTo ? await message.getReplyMessage() : null;
         if (reportedMedia && reportedMedia.media) {
             const chatId = message.chat?.id.toString();
-            const customCaption = `this was reported. Reason: ${message.message}, ID: <a href='https://t.me/c/${chatId}/${message.id}'>${message.id}</a>`
+            const customCaption = `this was reported. Reason: ${message.message}, 
+            ID: <a href='https://t.me/c/${chatId}/${message.id}'>${message.id}</a>`
             await sendMedia(reportedMedia.media, customCaption);
         };
     } catch (err) {
