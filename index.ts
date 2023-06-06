@@ -72,8 +72,8 @@ async function getReported(event: NewMessageEvent) {
         const reportedMedia = message.replyTo ? await message.getReplyMessage() : null;
         if (reportedMedia && reportedMedia.media) {
             const chatId = message.chat?.id.toString();
-            const customCaption = `this was reported. Reason: ${message.message}, 
-            ID: <a href='https://t.me/c/${chatId}/${message.id}'>${message.id}</a>`
+            const customCaption = `this was reported. Reason: ${message.message}, ` +
+            `ID: <a href='https://t.me/c/${chatId}/${message.id}'>${message.id}</a>`
             await sendMedia(reportedMedia.media, customCaption);
         };
     } catch (err) {
