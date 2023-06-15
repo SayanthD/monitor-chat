@@ -104,12 +104,12 @@ const client = new TelegramClient(
 
 (async () => {
     await client.start({ botAuthToken: "" });
-    for (let chat of chatsToMonitor) {
+    for (const chat of chatsToMonitor) {
         try {
             availableChats.push((await client.getEntity(chat)).id);
         }
         catch (error) {
-            console.error(`Invalid chat '${chat} given!`);
+            console.error(`Invalid chat '${chat}' given!`);
         }
     }
     client.addEventHandler(getReported, new NewMessage({ chats: availableChats, pattern: rgxMatches }));
