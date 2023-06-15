@@ -36,21 +36,19 @@ const apiId = Number(process.env.apiId);
 if (isNaN(apiId)) {
     throw new Error('Invalid apiId');
 }
-const apiHash = process.env.apiHash;
+const apiHash = process.env.apiHash as string;
 if (!apiHash) {
     throw new Error('apiHash is required');
 }
 
 const stringSession = new StringSession(process.env.stringSession);
 const rgxMatches = new RegExp(process.env.rgxPattern as string, "i");
-const sourceChat = Number(process.env.sourceChat);
-if (isNaN(sourceChat)) {
-    throw new Error('Invalid sourceChat');
-}
 const targetChat = Number(process.env.targetChat);
 if (isNaN(targetChat)) {
     throw new Error('Invalid targetChat');
 }
+const chatsToMonitor = (process.env.sourceChats)?.split(",") as Array<string>;
+const availableChats = new Array();
 
 async function sendMedia(media: Api.TypeMessageMedia, caption: String) {
     try {
@@ -73,7 +71,7 @@ async function getReported(event: NewMessageEvent) {
         if (reportedMedia && reportedMedia.media) {
             const chatId = message.chat?.id.toString();
             const customCaption = `this was reported. Reason: ${message.message}, ` +
-            `ID: <a href='https://t.me/c/${chatId}/${message.id}'>${message.id}</a>`
+                `ID: <a href='https://t.me/c/${chatId}/${message.id}'>${message.id}</a>`
             await sendMedia(reportedMedia.media, customCaption);
         };
     } catch (err) {
@@ -106,15 +104,16 @@ const client = new TelegramClient(
 
 (async () => {
     await client.start({ botAuthToken: "" });
-    try {
-        const chatToMonitor = await client.getEntity(sourceChat);
-
-        client.addEventHandler(getReported, new NewMessage({ chats: [chatToMonitor.id], pattern: rgxMatches }));
-        client.addEventHandler(getMedia, new NewMessage({ chats: [chatToMonitor.id] }));
+    for (let chat of chatsToMonitor) {
+        try {
+            availableChats.push((await client.getEntity(chat)).id);
+        }
+        catch (error) {
+            console.error(`Invalid chat '${chat} given!`);
+        }
     }
-    catch (error) {
-        throw new Error("Invalid chat given!");
-    }
+    client.addEventHandler(getReported, new NewMessage({ chats: availableChats, pattern: rgxMatches }));
+    client.addEventHandler(getMedia, new NewMessage({ chats: availableChats }));
 
     client.setParseMode("html");
     const me = await client.getMe() as Api.User;
